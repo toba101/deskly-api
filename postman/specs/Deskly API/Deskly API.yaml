@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Deskly API
+  version: 1.0.0
+  description: Hot-desk booking service for a hybrid office. Endpoints for managing desks and bookings.
+servers:
+  - url: 'http://localhost:4000'
+paths:
+  /desks:
+    get:
+      summary: List Desks
+      parameters:
+        - name: zone
+          in: query
+          description: 'Filter by zone: north | south | quiet'
+          schema:
+            type: string
+          example: north
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses: {}
+  '/desks/{deskId}':
+    get:
+      summary: Get Desk
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses: {}
+    parameters:
+      - name: deskId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: desk-1
+  /bookings:
+    get:
+      summary: List Bookings
+      parameters:
+        - name: date
+          in: query
+          description: Filter by date YYYY-MM-DD
+          schema:
+            type: string
+          example: '2026-08-06'
+        - name: deskId
+          in: query
+          description: Filter by desk ID
+          schema:
+            type: string
+          example: desk-1
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses: {}
+    post:
+      summary: Create Booking
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deskId:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                bookedBy:
+                  type: string
+                  format: email
+            example:
+              deskId: desk-3
+              date: '2026-11-10'
+              bookedBy: toba@example.com
+  '/bookings/{bookingId}':
+    get:
+      summary: Get Booking
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses: {}
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: bkg_seed01
+    delete:
+      summary: Delete Booking
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses: {}
