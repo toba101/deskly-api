@@ -13,4 +13,5 @@ scenarios:
   - name: default
     path: ./default.js
     default: true
+    id: 01a19358-6d4b-76f1-9911-95ec23759105
 cors: true

@@ -1,9 +1,14 @@
-# Use this workspace to collaborate
 workspace:
   id: f5365212-8657-4de7-a989-aeb992f344dc
 
-# All resources in the `postman/` folder are automatically registered in Local View.
-# Point to additional files outside the `postman/` folder to register them individually. Example:
-#localResources:
-#  collections:
-#    - ../tests/E2E Test Collection/
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Deskly API: 57478856-15dd6ca0-e6a6-4427-a579-3312b7eda0e4
+    ../postman/collections/Payments Mock - Pattern Tests: 57478856-d3742fcf-8062-4b7e-aa85-369f68f2ac7b
+  mocks:
+    ../postman/mocks/deskly-api/config.yaml: deskly-api-mock
+    ../postman/mocks/payments-api/config.yaml: 01a18e42-c79d-739c-b20c-5a00c62e667a
+  globals:
+    ../postman/globals/workspace.globals.yaml: 7b2b977c-e2fa-4d98-85c5-5801d743dfc9

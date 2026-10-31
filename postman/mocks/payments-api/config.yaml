@@ -13,3 +13,4 @@ scenarios:
   - name: default
     path: ./default.js
     default: true
+    id: 01a19358-6d73-7409-a77b-30e3329e124b
