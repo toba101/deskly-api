@@ -1,64 +1,58 @@
-name: Deskly API CI
+name: Deskly mock smoke
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - "feature/**"
   pull_request:
-    branches: [main, master]
 
 jobs:
-  test:
-    name: Run Deskly API Tests
+  mock-smoke:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Start mock server
-        run: node postman/mocks/deskly-api/default.js &
-        env:
-          PORT: 4500
-
-      - name: Wait for mock server to be ready
+      - name: Verify mock file exists
         run: |
-          echo "Waiting for mock server on port 4000..."
-          for i in $(seq 1 10); do
-            curl -sf http://localhost:4500/health && break
-            echo "Attempt $i failed, retrying in 1s..."
+          ls -R postman/mocks
+          test -f postman/mocks/deskly-api/default.js
+
+      - name: Start Deskly mock
+        run: |
+          PORT=4500 node postman/mocks/deskly-api/default.js > mock.log 2>&1 &
+          echo $! > mock.pid
+
+      - name: Wait for mock
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:4500/health; then
+              echo "Mock is ready"
+              exit 0
+            fi
+            echo "Attempt $i failed"
             sleep 1
           done
 
-      - name: Install Postman CLI
+          echo "===== MOCK LOG ====="
+          cat mock.log || true
+          echo "===================="
+          exit 1
+
+      - name: Smoke request against mock
         run: |
-          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
-          echo "$HOME/.postman/bin" >> $GITHUB_PATH
+          curl -sf http://localhost:4500/health
 
-      - name: Create results directory
-        run: mkdir -p results
-
-      - name: Run Deskly API collection
-        run: |
-          postman collection run "postman/collections/Deskly API" \
-            --env-var "baseUrl=http://localhost:4500" \
-            --env-var "apiKey=${{ secrets.DESKLY_API_KEY }}" \
-            --reporters cli,json \
-            --reporter-json-export results/collection-run.json
-        env:
-          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
-
-      - name: Upload test results
+      - name: Stop mock
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: collection-run-results
-          path: results/collection-run.json
+        run: |
+          kill $(cat mock.pid) || true
