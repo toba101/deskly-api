@@ -1,0 +1,23 @@
+$kind: http-request
+method: POST
+url: 'http://localhost:4600/charge'
+order: 8000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 5000,
+      "currency": "usd",
+      "source": "tok_visa"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Attempt 7: status is 200", () => pm.expect(pm.response.code).to.equal(200));
+      pm.test("Attempt 7: success is true", () => pm.expect(pm.response.json().success).to.be.true);
+      pm.test("Attempt 7: attempt is 7", () => pm.expect(pm.response.json().attempt).to.equal(7));
+      pm.test("Attempt 7: recovery note present", () => pm.expect(pm.response.json().note).to.equal('Recovered after gateway error'));

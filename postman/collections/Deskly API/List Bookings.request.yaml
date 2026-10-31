@@ -1,0 +1,17 @@
+$kind: http-request
+name: List Bookings
+order: 3000
+method: GET
+url: 'http://localhost:4000/bookings'
+headers:
+  - key: X-API-Key
+    value: demo-key
+queryParams:
+  - key: date
+    value: '2026-08-06'
+    description: 'Filter by date YYYY-MM-DD'
+    disabled: true
+  - key: deskId
+    value: desk-1
+    description: Filter by desk ID
+    disabled: true

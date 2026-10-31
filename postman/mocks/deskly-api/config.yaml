@@ -1,0 +1,16 @@
+id: deskly-api-mock
+version: 1
+name: Deskly API
+slug: deskly-api
+enableSession: true
+protocol: http
+port: 4500
+autoRestartOnChange: true
+logging:
+  level: verbose
+  showBody: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true
+cors: true

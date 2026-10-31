@@ -1,0 +1,15 @@
+id: 01a18e42-c79d-739c-b20c-5a00c62e667a
+version: 1
+name: Payments API
+slug: payments-api
+enableSession: true
+protocol: http
+port: 4600
+autoRestartOnChange: true
+logging:
+  level: verbose
+  showBody: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

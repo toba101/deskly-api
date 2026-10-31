@@ -1,0 +1,24 @@
+$kind: http-request
+method: POST
+url: 'http://localhost:4600/charge'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 5000,
+      "currency": "usd",
+      "source": "tok_visa"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Attempt 1: status is 200", () => pm.expect(pm.response.code).to.equal(200));
+      pm.test("Attempt 1: success is true", () => pm.expect(pm.response.json().success).to.be.true);
+      pm.test("Attempt 1: attempt is 1", () => pm.expect(pm.response.json().attempt).to.equal(1));
+      pm.test("Attempt 1: no recovery note", () => pm.expect(pm.response.json()).to.not.have.property('note'));
+      pm.test("Attempt 1: chargeId present", () => pm.expect(pm.response.json().chargeId).to.be.a('string').and.match(/^ch_/));

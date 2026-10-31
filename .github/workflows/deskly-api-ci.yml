@@ -1,0 +1,64 @@
+name: Deskly API CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Run Deskly API Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start mock server
+        run: node postman/mocks/deskly-api/default.js &
+        env:
+          PORT: 4000
+
+      - name: Wait for mock server to be ready
+        run: |
+          echo "Waiting for mock server on port 4000..."
+          for i in $(seq 1 10); do
+            curl -sf http://localhost:4000/health && break
+            echo "Attempt $i failed, retrying in 1s..."
+            sleep 1
+          done
+
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+          echo "$HOME/.postman/bin" >> $GITHUB_PATH
+
+      - name: Create results directory
+        run: mkdir -p results
+
+      - name: Run Deskly API collection
+        run: |
+          postman collection run "postman/collections/Deskly API" \
+            --env-var "baseUrl=http://localhost:4000" \
+            --env-var "apiKey=${{ secrets.DESKLY_API_KEY }}" \
+            --reporters cli,json \
+            --reporter-json-export results/collection-run.json
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collection-run-results
+          path: results/collection-run.json

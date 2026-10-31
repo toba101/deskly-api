@@ -1,0 +1,3 @@
+$kind: collection
+name: Deskly API
+description: 'Hot-desk booking service for a hybrid office. Endpoints for managing desks and bookings.'

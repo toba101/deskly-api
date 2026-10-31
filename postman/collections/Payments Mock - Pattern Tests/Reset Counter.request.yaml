@@ -1,0 +1,10 @@
+$kind: http-request
+method: DELETE
+url: 'http://localhost:4600/charge/state'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Reset: status is 200", () => pm.expect(pm.response.code).to.equal(200));
+      pm.test("Reset: reset is true", () => pm.expect(pm.response.json().reset).to.equal(true));

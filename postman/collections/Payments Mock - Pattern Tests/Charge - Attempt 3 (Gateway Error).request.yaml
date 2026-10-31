@@ -1,0 +1,23 @@
+$kind: http-request
+method: POST
+url: 'http://localhost:4600/charge'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 5000,
+      "currency": "usd",
+      "source": "tok_visa"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Attempt 3: status is 500", () => pm.expect(pm.response.code).to.equal(500));
+      pm.test("Attempt 3: error code is PAYMENT_GATEWAY_ERROR", () => pm.expect(pm.response.json().error).to.equal('PAYMENT_GATEWAY_ERROR'));
+      pm.test("Attempt 3: attempt is 3", () => pm.expect(pm.response.json().attempt).to.equal(3));
+      pm.test("Attempt 3: message present", () => pm.expect(pm.response.json().message).to.be.a('string'));
